@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AngelOne Support Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message-user {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+
+        .message-bot {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .typing-indicator {
+            display: none;
+        }
+
+        .typing-indicator.show {
+            display: flex;
+        }
+
+        .dot {
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+
+        .send-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .send-button:disabled {
+            background: #374151;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .source-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .source-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-white mb-2">AngelOne Support Assistant</h1>
+        <p class="text-white text-opacity-80">Get instant help with your trading and investment queries</p>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="chat-container rounded-2xl shadow-2xl overflow-hidden">
+        <!-- Chat Header -->
+        <div class="bg-white bg-opacity-10 px-6 py-4 border-b border-white border-opacity-20">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                    <span class="text-white font-medium">AI Assistant Online</span>
+                </div>
+                <button onclick="clearChat()" class="text-white text-opacity-60 hover:text-opacity-100 transition-all">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chatMessages" class="chat-messages h-96 overflow-y-auto p-6 space-y-4 scroll-smooth">
+            <!-- Welcome Message -->
+            <div class="flex justify-start">
+                <div class="message-bot rounded-2xl rounded-bl-md px-4 py-3 max-w-xs lg:max-w-md">
+                    <div class="flex items-start space-x-2">
+                        <i class="fas fa-robot text-blue-300 mt-1"></i>
+                        <div class="flex-1">
+                            <p class="text-white text-sm">
+                                Hi! I'm your AngelOne support assistant. I can help you with trading, account
+                                management, and investment queries. How can I assist you today?
+                            </p>
+                            <div class="mt-3 space-y-2">
+                                <p class="text-xs text-white text-opacity-60 font-medium">Quick suggestions:</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button onclick="sendQuickMessage('How do I add funds to my account?')"
+                                            class="bg-white bg-opacity-10 hover:bg-opacity-20 text-white px-3 py-1 rounded-full text-xs transition-all border border-white border-opacity-20">
+                                        <i class="fas fa-wallet mr-1"></i>Add Funds
+                                    </button>
+                                    <button onclick="sendQuickMessage('What are the brokerage charges?')"
+                                            class="bg-white bg-opacity-10 hover:bg-opacity-20 text-white px-3 py-1 rounded-full text-xs transition-all border border-white border-opacity-20">
+                                        <i class="fas fa-chart-line mr-1"></i>Brokerage Fees
+                                    </button>
+                                    <button onclick="sendQuickMessage('How to withdraw money?')"
+                                            class="bg-white bg-opacity-10 hover:bg-opacity-20 text-white px-3 py-1 rounded-full text-xs transition-all border border-white border-opacity-20">
+                                        <i class="fas fa-money-bill-wave mr-1"></i>Withdraw Money
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="typingIndicator" class="typing-indicator px-6 pb-4">
+            <div class="message-bot rounded-2xl rounded-bl-md px-4 py-3 max-w-xs">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-robot text-blue-300"></i>
+                    <div class="flex space-x-1">
+                        <div class="dot w-2 h-2 bg-white bg-opacity-60 rounded-full"></div>
+                        <div class="dot w-2 h-2 bg-white bg-opacity-60 rounded-full"></div>
+                        <div class="dot w-2 h-2 bg-white bg-opacity-60 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="bg-white bg-opacity-5 px-6 py-4 border-t border-white border-opacity-20">
+            <div class="flex space-x-4">
+                <div class="flex-1">
+                    <input
+                            id="messageInput"
+                            type="text"
+                            placeholder="Ask me anything about AngelOne services..."
+                            class="w-full bg-white bg-opacity-10 border border-white border-opacity-20 rounded-xl px-4 py-3 text-white placeholder-white placeholder-opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                            onkeypress="handleKeyPress(event)"
+                    >
+                </div>
+                <button
+                        id="sendButton"
+                        onclick="sendMessage()"
+                        class="send-button px-6 py-3 rounded-xl text-white font-medium flex items-center space-x-2 transition-all"
+                >
+                    <span>Send</span>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8000';
+    let conversationId = null;
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function sendQuickMessage(message) {
+        addMessage(message, 'user');
+        processMessage(message);
+    }
+
+    async function sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+
+        if (!message) return;
+
+        messageInput.value = '';
+        addMessage(message, 'user');
+        await processMessage(message);
+    }
+
+    async function processMessage(message) {
+        const sendButton = document.getElementById('sendButton');
+
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<span>Sending...</span><i class="fas fa-spinner fa-spin"></i>';
+        showTypingIndicator();
+
+        try {
+            // Start the API call
+            const apiPromise = fetch(`${API_BASE_URL}/api/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    conversation_id: conversationId
+                })
+            });
+
+            // Create a minimum delay promise (1.5-2 seconds)
+            const minDelay = new Promise(resolve => {
+                const randomDelay = 1500 + Math.random() * 500; // 1.5-2 seconds
+                setTimeout(resolve, randomDelay);
+            });
+
+            // Wait for both the API response and minimum delay
+            const [response] = await Promise.all([apiPromise, minDelay]);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.conversation_id) {
+                conversationId = data.conversation_id;
+            }
+
+            hideTypingIndicator();
+            addMessage(data.response, 'bot', data.sources);
+
+        } catch (error) {
+            console.error('Error sending message:', error);
+
+            // Even for errors, wait for the minimum delay to complete
+            const minDelay = new Promise(resolve => {
+                const randomDelay = 1500 + Math.random() * 500;
+                setTimeout(resolve, randomDelay);
+            });
+
+            await minDelay;
+            hideTypingIndicator();
+
+            addMessage(
+                "I'm sorry, I'm having trouble connecting to the server right now. Please check if the API is running on http://localhost:8000 and try again.",
+                'bot'
+            );
+        }
+
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<span>Send</span><i class="fas fa-paper-plane"></i>';
+        document.getElementById('messageInput').focus();
+    }
+
+    function addMessage(message, sender, sources = []) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+
+        if (sender === 'user') {
+            messageDiv.className = 'flex justify-end';
+            messageDiv.innerHTML = `
+                    <div class="message-user rounded-2xl rounded-br-md px-4 py-3 max-w-xs lg:max-w-md">
+                        <p class="text-white text-sm">${message}</p>
+                    </div>
+                `;
+        } else {
+            messageDiv.className = 'flex justify-start';
+            let sourcesHtml = '';
+
+            if (sources && sources.length > 0) {
+                sourcesHtml = `
+                        <div class="mt-3 space-y-2">
+                            <p class="text-xs text-white text-opacity-60 font-medium">Sources:</p>
+                            ${sources.map(source => `
+                                <a href="${source.url}" target="_blank" class="source-card block p-2 rounded-lg">
+                                    <p class="text-xs text-white font-medium">${source.title}</p>
+                                    <p class="text-xs text-white text-opacity-60">Relevance: ${Math.round(source.relevance_score * 100)}%</p>
+                                </a>
+                            `).join('')}
+                        </div>
+                    `;
+            }
+
+            const quickActions = getQuickActions();
+            let quickActionsHtml = '';
+            if (quickActions.length > 0) {
+                quickActionsHtml = `
+                        <div class="mt-3 space-y-2">
+                            <p class="text-xs text-white text-opacity-60 font-medium">Quick suggestions:</p>
+                            <div class="flex flex-wrap gap-2">
+                                ${quickActions.map(action => `
+                                    <button onclick="sendQuickMessage('${action.message}')" class="bg-white bg-opacity-10 hover:bg-opacity-20 text-white px-3 py-1 rounded-full text-xs transition-all border border-white border-opacity-20">
+                                        <i class="${action.icon} mr-1"></i>${action.text}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+            }
+
+            messageDiv.innerHTML = `
+                    <div class="message-bot rounded-2xl rounded-bl-md px-4 py-3 max-w-xs lg:max-w-md">
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-robot text-blue-300 mt-1"></i>
+                            <div class="flex-1">
+                                <p class="text-white text-sm">${message}</p>
+                                ${sourcesHtml}
+                                ${quickActionsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+        }
+
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function getQuickActions() {
+        const actions = [
+            {text: "Add Funds", message: "How do I add funds to my account?", icon: "fas fa-wallet"},
+            {text: "Brokerage Fees", message: "What are the brokerage charges?", icon: "fas fa-chart-line"},
+            {text: "Withdraw Money", message: "How to withdraw money?", icon: "fas fa-money-bill-wave"},
+            {text: "Margin Trading", message: "What is margin trading?", icon: "fas fa-percentage"},
+            {text: "Account Status", message: "How to check my account status?", icon: "fas fa-user-circle"}
+        ];
+
+        return actions.sort(() => 0.5 - Math.random()).slice(0, 3);
+    }
+
+    function showTypingIndicator() {
+        document.getElementById('typingIndicator').classList.add('show');
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+        document.getElementById('typingIndicator').classList.remove('show');
+    }
+
+    function clearChat() {
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.innerHTML = `
+                <div class="flex justify-start">
+                    <div class="message-bot rounded-2xl rounded-bl-md px-4 py-3 max-w-xs lg:max-w-md">
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-robot text-blue-300 mt-1"></i>
+                            <div class="flex-1">
+                                <p class="text-white text-sm">
+                                    Hi! I'm your AngelOne support assistant. I can help you with trading, account management, and investment queries. How can I assist you today?
+                                </p>
+                                <div class="mt-3 space-y-2">
+                                    <p class="text-xs text-white text-opacity-60 font-medium">Quick suggestions:</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button onclick="sendQuickMessage('How do I add funds to my account?')" class="bg-white bg-opacity-10 hover:bg-opacity-20 text-white px-3 py-1 rounded-full text-xs transition-all border border-white border-opacity-20">
+                                            <i class="fas fa-wallet mr-1"></i>Add Funds
+                                        </button>
+                                        <button onclick="sendQuickMessage('What are the brokerage charges?')" class="bg-white bg-opacity-10 hover:bg-opacity-20 text-white px-3 py-1 rounded-full text-xs transition-all border border-white border-opacity-20">
+                                            <i class="fas fa-chart-line mr-1"></i>Brokerage Fees
+                                        </button>
+                                        <button onclick="sendQuickMessage('How to withdraw money?')" class="bg-white bg-opacity-10 hover:bg-opacity-20 text-white px-3 py-1 rounded-full text-xs transition-all border border-white border-opacity-20">
+                                            <i class="fas fa-money-bill-wave mr-1"></i>Withdraw Money
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        conversationId = null;
+    }
+
+    window.addEventListener('load', function () {
+        document.getElementById('messageInput').focus();
+    });
+</script>
+</body>
+</html>
