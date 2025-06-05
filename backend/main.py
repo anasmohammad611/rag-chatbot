@@ -1,4 +1,5 @@
 import logging
+import sys
 from typing import List, Dict, Optional
 
 from fastapi import FastAPI, HTTPException
@@ -6,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from transformers import pipeline
 
-# Import our vector database
+sys.path.append('.')
 from vectorDB import ChromaVectorDB
 
 # Set up logging
