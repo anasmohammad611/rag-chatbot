@@ -63,35 +63,28 @@ def load_free_models():
 
         # Option 1: Question Answering pipeline (lightweight)
         logger.info("Loading Q&A model...")
-        # qa_pipeline = pipeline(
-        #     "question-answering",
-        #     model="distilbert-base-cased-distilled-squad",
-        #     tokenizer="distilbert-base-cased-distilled-squad"
-        # )
         qa_pipeline = pipeline(
             "question-answering",
-            model="distilbert-base-uncased-distilled-squad",  # Smaller variant
-            tokenizer="distilbert-base-uncased-distilled-squad"
+            model="distilbert-base-cased-distilled-squad",
+            tokenizer="distilbert-base-cased-distilled-squad"
         )
 
         # Option 2: Text generation model (for better responses)
         logger.info("Loading text generation model...")
-        # try:
-        #     # Try a small, fast model first
-        #     text_generator = pipeline(
-        #         "text-generation",
-        #         model="microsoft/DialoGPT-small",
-        #         tokenizer="microsoft/DialoGPT-small",
-        #         max_length=200,
-        #         do_sample=True,
-        #         temperature=0.7,
-        #         pad_token_id=50256
-        #     )
-        # except Exception as e:
-        #     logger.warning(f"Could not load text generation model: {e}")
-        #     text_generator = None
-
-        text_generator = None  # Disable text generation for prod
+        try:
+            # Try a small, fast model first
+            text_generator = pipeline(
+                "text-generation",
+                model="microsoft/DialoGPT-small",
+                tokenizer="microsoft/DialoGPT-small",
+                max_length=200,
+                do_sample=True,
+                temperature=0.7,
+                pad_token_id=50256
+            )
+        except Exception as e:
+            logger.warning(f"Could not load text generation model: {e}")
+            text_generator = None
 
         logger.info("✅ Models loaded successfully")
         return True
