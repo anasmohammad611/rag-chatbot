@@ -35,6 +35,24 @@ This project implements a **Retrieval-Augmented Generation (RAG) chatbot** speci
 
 ---
 
+---
+
+## Screenshots
+
+### Working Chatbot Interface
+![Chatbot Interface](screenshots/chatbotUI.png)
+*Clean, responsive chat interface*
+
+### Valid AngelOne Query Response
+![Valid Query](screenshots/rightOP.png)
+*Example of the bot answering an AngelOne-specific question with source references*
+
+### "I Don't Know" Response for Out-of-Scope Questions
+![I Don't Know Response](screenshots/outOfScopeOP.png)
+*Bot correctly refusing to answer questions outside the AngelOne knowledge base*
+
+---
+
 ## Development Journey
 
 ### Learning Phase
